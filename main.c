@@ -14,12 +14,13 @@ void MapSetup(void);
 Player *PlayerSetup(void);
 void HandleInput(int input, Player *player);
 void PlayerMove(Player *player, int y, int x);
+void CheckDestination(Player *player, int y, int x);
 
 int main(void)
 {
    Player *player;
    int input;
-   
+
    ScreenSetup();
    MapSetup();
 
@@ -27,12 +28,12 @@ int main(void)
 
    while ((input = getch()) != 'q')     // game loop
    {
-     HandleInput(input, player); 
+      HandleInput(input, player); 
    }
 
    free(player);              // free memory on heap
    endwin();                  // terminate ncurses
-   
+
    return 0;
 }
 
@@ -71,7 +72,7 @@ void MapSetup(void)
    mvprintw(5, 40, "|......|");              // Move cursor and print
    mvprintw(6, 40, "|......|");              // Move cursor and print
    mvprintw(7, 40, "--------");              // Move cursor and print
-   
+
    mvprintw(10, 40, "----------");           // Move cursor and print
    mvprintw(11, 40, "|........|");           // Move cursor and print
    mvprintw(12, 40, "|........|");           // Move cursor and print
@@ -95,27 +96,38 @@ Player *PlayerSetup(void)
 
 void HandleInput(int input, Player *player)
 {
+   int yDestination;
+   int xDestination;
+
    switch (input)
    {
       case 'w':
       case 'W':
-         PlayerMove(player, player->yPosition - 1, player->xPosition);
+         yDestination = player->yPosition - 1;
+         xDestination = player->xPosition;
          break;
       case 'a':
       case 'A':
-         PlayerMove(player, player->yPosition, player->xPosition - 1);
+         yDestination = player->yPosition;
+         xDestination = player->xPosition - 1;
          break;
       case 's':
       case 'S':
-         PlayerMove(player, player->yPosition + 1, player->xPosition);
+         yDestination = player->yPosition + 1;
+         xDestination = player->xPosition;
          break;
       case 'd':
       case 'D':
-         PlayerMove(player, player->yPosition, player->xPosition + 1);
+         yDestination = player->yPosition;
+         xDestination = player->xPosition + 1;
          break;
       default:
+         yDestination = player->yPosition;
+         xDestination = player->xPosition;
          break;
    }
+   
+   CheckDestination(player, yDestination, xDestination);
 }
 
 void PlayerMove(Player *player, int y, int x)
@@ -127,4 +139,17 @@ void PlayerMove(Player *player, int y, int x)
 
    mvprintw(player->yPosition, player->xPosition, "@"); // Redraw player
    move(player->yPosition, player->xPosition); // Fix cursor
+}
+
+/* Checks destination tile and processes move. */
+void CheckDestination(Player *player, int y, int x)
+{
+   switch (mvinch(y, x))   // mvinch returns character at (y,x)
+   {
+      case '.':
+         PlayerMove(player, y, x);
+         break;
+      default:
+         break;
+   }
 }
