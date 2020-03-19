@@ -12,6 +12,8 @@ void *SafeMalloc(size_t size);
 void ScreenSetup(void);
 void MapSetup(void);
 Player *PlayerSetup(void);
+void HandleInput(int input, Player *player);
+void PlayerMove(Player *player, int y, int x);
 
 int main(void)
 {
@@ -25,9 +27,10 @@ int main(void)
 
    while ((input = getch()) != 'q')     // game loop
    {
-         
+     HandleInput(input, player); 
    }
 
+   free(player);              // free memory on heap
    endwin();                  // terminate ncurses
    
    return 0;
@@ -49,7 +52,6 @@ void *SafeMalloc(size_t size)
 void ScreenSetup(void)
 {
    initscr();                 // initializes screen
-   printw("Hello world!");    // prints text to screen
    noecho();                  // Prevents keystrokes from displaying
    refresh();                 // Draw to screen
 }
@@ -84,10 +86,45 @@ Player *PlayerSetup(void)
 
    player->xPosition = 14;
    player->yPosition = 14;
-   player->health = 0;
+   player->health = 20;
 
-   mvprintw(player->yPosition, player->xPosition, "@");  // Draw player
-   move(player->yPosition, player->xPosition);  // Reset cursor
+   PlayerMove(player, player->yPosition, player->xPosition);
 
    return player;
+}
+
+void HandleInput(int input, Player *player)
+{
+   switch (input)
+   {
+      case 'w':
+      case 'W':
+         PlayerMove(player, player->yPosition - 1, player->xPosition);
+         break;
+      case 'a':
+      case 'A':
+         PlayerMove(player, player->yPosition, player->xPosition - 1);
+         break;
+      case 's':
+      case 'S':
+         PlayerMove(player, player->yPosition + 1, player->xPosition);
+         break;
+      case 'd':
+      case 'D':
+         PlayerMove(player, player->yPosition, player->xPosition + 1);
+         break;
+      default:
+         break;
+   }
+}
+
+void PlayerMove(Player *player, int y, int x)
+{
+   mvprintw(player->yPosition, player->xPosition, ".");  // Redraw floor
+
+   player->yPosition = y;  // update player's internal position state
+   player->xPosition = x;
+
+   mvprintw(player->yPosition, player->xPosition, "@"); // Redraw player
+   move(player->yPosition, player->xPosition); // Fix cursor
 }
