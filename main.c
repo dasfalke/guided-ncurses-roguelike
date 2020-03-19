@@ -1,6 +1,18 @@
 #include <stdlib.h>
 #include <ncurses.h>
 
+#define NUM_OF_ROOMS 3
+
+typedef struct Room
+{
+   int yDimensionOrigin;
+   int xDimensionOrigin;
+   int heightDimension;
+   int widthDimension;
+   //Monster **monsters;
+   //Item **items;
+} Room;
+
 typedef struct Player
 {
    int xPosition;
@@ -10,19 +22,27 @@ typedef struct Player
 
 void *SafeMalloc(size_t size);
 void ScreenSetup(void);
-void MapSetup(void);
+Room **MapSetup(void);
 Player *PlayerSetup(void);
+void DestryPlayer(Player *player);
+void DestroyPlayer(Player *player);
 void HandleInput(int input, Player *player);
 void PlayerMove(Player *player, int y, int x);
 void CheckDestination(Player *player, int y, int x);
 
+/* Room functions */
+Room *CreateRoom(int y, int x, int height, int width);
+void DrawRoom(Room *room);
+void DestroyRooms(Room **rooms);
+
 int main(void)
 {
+   Room **rooms;
    Player *player;
    int input;
 
    ScreenSetup();
-   MapSetup();
+   rooms = MapSetup();
 
    player = PlayerSetup();
 
@@ -31,7 +51,10 @@ int main(void)
       HandleInput(input, player); 
    }
 
-   free(player);              // free memory on heap
+   /* Free memory */
+   DestroyRooms(rooms);
+   DestroyPlayer(player);
+
    endwin();                  // terminate ncurses
 
    return 0;
@@ -57,28 +80,70 @@ void ScreenSetup(void)
    refresh();                 // Draw to screen
 }
 
-void MapSetup(void)
+Room **MapSetup(void)
 {
-   mvprintw(13, 13, "--------");             // Move cursor and print
-   mvprintw(14, 13, "|......|");             // Move cursor and print
-   mvprintw(15, 13, "|......|");             // Move cursor and print
-   mvprintw(16, 13, "|......|");             // Move cursor and print
-   mvprintw(17, 13, "|......|");             // Move cursor and print
-   mvprintw(18, 13, "--------");             // Move cursor and print
+   Room **rooms = (Room **)SafeMalloc(sizeof(Room) * NUM_OF_ROOMS);
 
-   mvprintw(2, 40, "--------");              // Move cursor and print
-   mvprintw(3, 40, "|......|");              // Move cursor and print
-   mvprintw(4, 40, "|......|");              // Move cursor and print
-   mvprintw(5, 40, "|......|");              // Move cursor and print
-   mvprintw(6, 40, "|......|");              // Move cursor and print
-   mvprintw(7, 40, "--------");              // Move cursor and print
+   rooms[0] = CreateRoom(13, 13, 6, 8);
+   rooms[1] = CreateRoom(2, 40, 6, 8);
+   rooms[2] = CreateRoom(10, 40, 6, 12);
 
-   mvprintw(10, 40, "----------");           // Move cursor and print
-   mvprintw(11, 40, "|........|");           // Move cursor and print
-   mvprintw(12, 40, "|........|");           // Move cursor and print
-   mvprintw(13, 40, "|........|");           // Move cursor and print
-   mvprintw(14, 40, "|........|");           // Move cursor and print
-   mvprintw(15, 40, "----------");           // Move cursor and print
+   DrawRoom(rooms[0]);
+   DrawRoom(rooms[1]);
+   DrawRoom(rooms[2]);
+
+   return rooms;
+}
+
+Room *CreateRoom(int y, int x, int height, int width)
+{
+   Room *room = (Room *)SafeMalloc(sizeof(Room));
+
+   room->yDimensionOrigin = y;
+   room->xDimensionOrigin = x;
+   room->heightDimension = height;
+   room->widthDimension = width;
+
+   return room;
+}
+
+void DrawRoom(Room *room)
+{
+   /* Draw top & bottom walls */
+   for (int i = room->xDimensionOrigin; i < room->xDimensionOrigin + room->widthDimension; ++i)
+   {
+      mvprintw(room->yDimensionOrigin, i, "-");  // Top wall
+      mvprintw(room->yDimensionOrigin + room->heightDimension - 1, i, "-"); //bottom wall
+   }
+
+   /* Draw side walls and floors */
+   for (int i = room->yDimensionOrigin + 1; i < room->yDimensionOrigin + room->heightDimension - 1; ++i)
+   {
+      mvprintw(i, room->xDimensionOrigin, "|"); // Left wall
+      mvprintw(i, room->xDimensionOrigin + room->widthDimension - 1, "|"); // right wall
+
+      for (int j = room->xDimensionOrigin + 1; j < room->xDimensionOrigin + room->widthDimension - 1; ++j)
+      {
+         mvprintw(i, j, "."); // Floors
+      }
+   }
+
+}
+
+void DestroyRooms(Room **rooms)
+{
+   if (rooms)
+   {
+      for (int i = 0; i < NUM_OF_ROOMS; ++i)
+      {
+         if (rooms[i])
+         {
+            free(rooms[i]);
+         }
+      }
+
+      free(rooms);
+   }
 }
 
 Player *PlayerSetup(void)
@@ -92,6 +157,14 @@ Player *PlayerSetup(void)
    PlayerMove(player, player->yPosition, player->xPosition);
 
    return player;
+}
+
+void DestroyPlayer(Player *player)
+{
+   if (player)
+   {
+      free(player);
+   }
 }
 
 void HandleInput(int input, Player *player)
@@ -126,7 +199,7 @@ void HandleInput(int input, Player *player)
          xDestination = player->xPosition;
          break;
    }
-   
+
    CheckDestination(player, yDestination, xDestination);
 }
 
