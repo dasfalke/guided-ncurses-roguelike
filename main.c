@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <ncurses.h>
+#include <time.h>
 
 #define NUM_OF_ROOMS 3
 
@@ -14,6 +15,8 @@ typedef struct Room
    Coordinate origin;
    int height;
    int width;
+
+   Coordinate doors[4];
 } Room;
 
 typedef struct Player
@@ -37,6 +40,8 @@ void DestroyRooms(Room **rooms);
 
 int main(void)
 {
+   srand(time(NULL));   // Seed the pseudo-random number generator
+
    Room **rooms;
    Player *player;
    int input;
@@ -109,6 +114,22 @@ Room *CreateRoom(int y, int x, int height, int width)
    room->height = height;
    room->width = width;
 
+   /* Top door */
+   room->doors[0].y = room->origin.y;
+   room->doors[0].x = rand() % (width - 2)  + room->origin.x + 1; // Remember to compensate for corners
+
+   /* Left door */
+   room->doors[1].y = rand() % (height - 2) + room->origin.y + 1;
+   room->doors[1].x = room->origin.x;
+
+   /* Bottom door */
+   room->doors[2].y = room->origin.y + room->height - 1;
+   room->doors[2].x = rand() % (width - 2) + room->origin.x + 1;
+
+   /* Right door */
+   room->doors[3].y = rand() % (height - 2) + room->origin.y + 1;
+   room->doors[3].x = room->origin.x + room->width - 1;
+
    return room;
 }
 
@@ -133,6 +154,12 @@ void DrawRoom(Room *room)
          mvprintw(i, j, "."); // Floors
       }
    }
+
+   /* Draw the doors */
+   mvprintw(room->doors[0].y, room->doors[0].x, "+");
+   mvprintw(room->doors[1].y, room->doors[1].x, "+");
+   mvprintw(room->doors[2].y, room->doors[2].x, "+");
+   mvprintw(room->doors[3].y, room->doors[3].x, "+");
 
 }
 
