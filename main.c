@@ -150,6 +150,7 @@ void CheckDestination(Player *player, int y, int x)
          PlayerMove(player, y, x);
          break;
       default:
+         move(player->yPosition, player->xPosition);  // Fix cursor
          break;
    }
 }
