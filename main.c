@@ -37,6 +37,7 @@ void CheckDestination(Player *player, int y, int x);
 Room *CreateRoom(int y, int x, int height, int width);
 void DrawRoom(Room *room);
 void DestroyRooms(Room **rooms);
+void ConnectDoors(Coordinate *doorOne, Coordinate *doorTwo);
 
 int main(void)
 {
@@ -101,6 +102,8 @@ Room **MapSetup(void)
    DrawRoom(rooms[1]);
    DrawRoom(rooms[2]);
 
+   ConnectDoors(&rooms[2]->doors[1], &rooms[0]->doors[3]);
+
    return rooms;
 }
 
@@ -162,6 +165,65 @@ void DrawRoom(Room *room)
    mvprintw(room->doors[3].y, room->doors[3].x, "+");
 
 }
+
+
+void ConnectDoors(Coordinate *doorDest, Coordinate *doorSrc)
+{
+   /* Temporary end of the hallway as it grows towards its destination. */
+   Coordinate hallTail;
+   hallTail.y = doorSrc->y;
+   hallTail.x = doorSrc->x;
+
+   /* Algorithm to grow the hallway. */
+   while (1)
+   {
+      /* Try to grow up. Check if space to up is closer to destination. If
+       * it is then check if that space is empty. If it is then grow the hallway. */
+      if ((abs((hallTail.y - 1) - doorDest->y) < abs(hallTail.y - doorDest->y)) && 
+            (mvinch(hallTail.y - 1, hallTail.x) == ' '))
+         {
+            mvprintw(hallTail.y - 1, hallTail.x, "#");
+            hallTail.y -= 1;
+         }
+      
+      /* Try to grow left. */
+      else if ((abs((hallTail.x - 1) - doorDest->x) < abs(hallTail.x - doorDest->x)) && 
+            (mvinch(hallTail.y, hallTail.x - 1) == ' '))
+         {
+            mvprintw(hallTail.y, hallTail.x - 1, "#");
+            hallTail.x -= 1;
+         }
+
+      /* Try to grow down. */
+      else if ((abs((hallTail.y + 1) - doorDest->y) < abs(hallTail.y - doorDest->y)) && 
+            (mvinch(hallTail.y + 1, hallTail.x) == ' '))
+         {
+            mvprintw(hallTail.y + 1, hallTail.x, "#");
+            hallTail.y += 1;
+         }
+
+      /* Try to grow right. */
+      else if ((abs((hallTail.x + 1) - doorDest->x) < abs(hallTail.x - doorDest->x)) && 
+            (mvinch(hallTail.y, hallTail.x + 1) == ' '))
+         {
+            mvprintw(hallTail.y, hallTail.x + 1, "#");
+            hallTail.x += 1;
+         }
+      else 
+      {
+         return;
+      }
+
+      /* Hallway has reached its destination. */
+      if (hallTail.x == doorDest->x && hallTail.y == doorDest->y)
+      {
+         break;
+      }
+   }
+
+
+}
+
 
 /* Frees memory used by room structs. */
 void DestroyRooms(Room **rooms)
@@ -258,6 +320,8 @@ void CheckDestination(Player *player, int y, int x)
    switch (mvinch(y, x))   // mvinch returns character at (y,x)
    {
       case '.':
+      case '+':
+      case '#':
          PlayerMove(player, y, x);
          break;
       default:
