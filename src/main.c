@@ -7,16 +7,22 @@ int main(void)
    Room **rooms;
    Player *player;
    int input;
+   Coordinate destination; /* Note: tutorial uses a pointer here */
+
 
    ScreenSetup();
    rooms = MapSetup();
+
+   char **level;
+   level = SaveLevelPositions(); /* TODO: need to free memory! */
 
    player = PlayerSetup();
 
    /* *** Main Game Loop *** */
    while ((input = getch()) != 'q')
    {
-      HandleInput(input, player); 
+      destination = HandleInput(player, input); 
+      CheckDestination(player, level, destination);
    }
 
    /* Free memory */
@@ -50,60 +56,41 @@ void ScreenSetup(void)
    refresh();                 // Draw to screen
 }
 
-/* Creates the map. */
-Room **MapSetup(void)
-{
-   Room **rooms = (Room **)SafeMalloc(sizeof(Room) * NUM_OF_ROOMS);
-
-   rooms[0] = CreateRoom(13, 13, 6, 8);
-   rooms[1] = CreateRoom(2, 40, 6, 8);
-   rooms[2] = CreateRoom(10, 40, 6, 12);
-
-   DrawRoom(rooms[0]);
-   DrawRoom(rooms[1]);
-   DrawRoom(rooms[2]);
-
-   ConnectDoors(&rooms[2]->doors[1], &rooms[0]->doors[3]);
-   ConnectDoors(&rooms[0]->doors[0], &rooms[1]->doors[2]);
-
-   return rooms;
-}
 
 /* Handles user input. */
-void HandleInput(int input, Player *player)
+Coordinate HandleInput(Player *player, int input)
 {
-   int yDestination;
-   int xDestination;
+   Coordinate destination;    // Note: Tutorial shows this on the heap for some reason
 
    switch (input)
    {
       case 'w':
       case 'W':
-         yDestination = player->location.y - 1;
-         xDestination = player->location.x;
+         destination.y = player->location.y - 1;
+         destination.x = player->location.x;
          break;
       case 'a':
       case 'A':
-         yDestination = player->location.y;
-         xDestination = player->location.x - 1;
+         destination.y = player->location.y;
+         destination.x = player->location.x - 1;
          break;
       case 's':
       case 'S':
-         yDestination = player->location.y + 1;
-         xDestination = player->location.x;
+         destination.y = player->location.y + 1;
+         destination.x = player->location.x;
          break;
       case 'd':
       case 'D':
-         yDestination = player->location.y;
-         xDestination = player->location.x + 1;
+         destination.y = player->location.y;
+         destination.x = player->location.x + 1;
          break;
       default:
-         yDestination = player->location.y;
-         xDestination = player->location.x;
+         destination.y = player->location.y;
+         destination.x = player->location.x;
          break;
    }
 
-   CheckDestination(player, yDestination, xDestination);
+   return destination;
 }
 
 

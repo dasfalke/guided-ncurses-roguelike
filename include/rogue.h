@@ -31,12 +31,13 @@ typedef struct Player
 void *SafeMalloc(size_t size);
 void ScreenSetup(void);
 Room **MapSetup(void);
+char **SaveLevelPositions(void);
 Player *PlayerSetup(void);
 void DestryPlayer(Player *player);
 void DestroyPlayer(Player *player);
-void HandleInput(int input, Player *player);
-void PlayerMove(Player *player, int y, int x);
-void CheckDestination(Player *player, int y, int x);
+Coordinate HandleInput(Player *player, int input);
+void PlayerMove(Player *player, char **level, Coordinate destination);
+void CheckDestination(Player *player, char **level, Coordinate destination);
 Room *CreateRoom(int y, int x, int height, int width);
 void DrawRoom(Room *room);
 void DestroyRooms(Room **rooms);
