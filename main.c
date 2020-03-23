@@ -103,6 +103,7 @@ Room **MapSetup(void)
    DrawRoom(rooms[2]);
 
    ConnectDoors(&rooms[2]->doors[1], &rooms[0]->doors[3]);
+   ConnectDoors(&rooms[0]->doors[0], &rooms[1]->doors[2]);
 
    return rooms;
 }
@@ -170,9 +171,15 @@ void DrawRoom(Room *room)
 void ConnectDoors(Coordinate *doorDest, Coordinate *doorSrc)
 {
    /* Temporary end of the hallway as it grows towards its destination. */
-   Coordinate hallTail;
+   Coordinate hallTail; 
    hallTail.y = doorSrc->y;
    hallTail.x = doorSrc->x;
+
+   /* Remember previous hallway coordinate. Used when needing to step back. */
+   Coordinate hallPrevious;
+   hallPrevious = hallTail;
+
+   int steppedBack = 0;
 
    /* Algorithm to grow the hallway. */
    while (1)
@@ -182,7 +189,7 @@ void ConnectDoors(Coordinate *doorDest, Coordinate *doorSrc)
       if ((abs((hallTail.y - 1) - doorDest->y) < abs(hallTail.y - doorDest->y)) && 
             (mvinch(hallTail.y - 1, hallTail.x) == ' '))
          {
-            mvprintw(hallTail.y - 1, hallTail.x, "#");
+            hallPrevious.y = hallTail.y;
             hallTail.y -= 1;
          }
       
@@ -190,7 +197,7 @@ void ConnectDoors(Coordinate *doorDest, Coordinate *doorSrc)
       else if ((abs((hallTail.x - 1) - doorDest->x) < abs(hallTail.x - doorDest->x)) && 
             (mvinch(hallTail.y, hallTail.x - 1) == ' '))
          {
-            mvprintw(hallTail.y, hallTail.x - 1, "#");
+            hallPrevious.x = hallTail.x;
             hallTail.x -= 1;
          }
 
@@ -198,7 +205,7 @@ void ConnectDoors(Coordinate *doorDest, Coordinate *doorSrc)
       else if ((abs((hallTail.y + 1) - doorDest->y) < abs(hallTail.y - doorDest->y)) && 
             (mvinch(hallTail.y + 1, hallTail.x) == ' '))
          {
-            mvprintw(hallTail.y + 1, hallTail.x, "#");
+            hallPrevious.y = hallTail.y;
             hallTail.y += 1;
          }
 
@@ -206,21 +213,25 @@ void ConnectDoors(Coordinate *doorDest, Coordinate *doorSrc)
       else if ((abs((hallTail.x + 1) - doorDest->x) < abs(hallTail.x - doorDest->x)) && 
             (mvinch(hallTail.y, hallTail.x + 1) == ' '))
          {
-            mvprintw(hallTail.y, hallTail.x + 1, "#");
+            hallPrevious.x = hallTail.x;
             hallTail.x += 1;
          }
       else 
       {
-         return;
+         if (!steppedBack)
+         {
+            hallTail = hallPrevious;
+            steppedBack = 1;
+            continue;
+         }
+         else 
+         {
+            return;
+         }
       }
 
-      /* Hallway has reached its destination. */
-      if (hallTail.x == doorDest->x && hallTail.y == doorDest->y)
-      {
-         break;
-      }
+      mvprintw(hallTail.y, hallTail.x, "#");
    }
-
 
 }
 
