@@ -56,11 +56,11 @@ Monster *SelectMonster(int levelId)
    switch (monster)
    {
       case SPIDER:
-         return CreateMonster('X', 2, 1, 1, 1, 1);
+         return CreateMonster('X', 2, 1, 1, 1, RANDOM);
       case GOBLIN:
-         return CreateMonster('G', 5, 3, 1, 1, 2);
+         return CreateMonster('G', 5, 3, 1, 1, SEEKING);
       case TROLL:
-         return CreateMonster('T', 15, 5, 1, 1, 1);
+         return CreateMonster('T', 15, 5, 1, 1, SEEKING);
       default:
          fputs("Monster init failed.\n", stderr);
          exit(EXIT_FAILURE);
@@ -69,7 +69,7 @@ Monster *SelectMonster(int levelId)
 }
 
 /* Initialize a monster. */
-Monster *CreateMonster(char symbol, int health, int attack, int speed, int defense, int pathfinding)
+Monster *CreateMonster(char symbol, int health, int attack, int speed, int defense, Pathing pathfinding)
 {
    Monster *monster = (Monster *)SafeMalloc(sizeof(Monster));
 
@@ -80,6 +80,8 @@ Monster *CreateMonster(char symbol, int health, int attack, int speed, int defen
    monster->defense = defense;
    monster->pathfinding = pathfinding;
 
+   sprintf(monster->string, "%c", symbol);
+
    return monster;
 }
 
@@ -88,7 +90,53 @@ void SetStartingPosition(Monster *monster, Room *room)
    monster->location.y = (rand() % (room->height - 2)) + room->origin.y + 1;
    monster->location.x = (rand() % (room->width - 2)) + room->origin.x + 1;
 
-   char symbol[8];
-   sprintf(symbol, "%c", monster->symbol);
-   mvprintw(monster->location.y, monster->location.x, symbol);
+   mvprintw(monster->location.y, monster->location.x, monster->string);
+}
+
+void MoveMonsters(Level *level)
+{
+   for (int i = 0; i < level->numberOfMonsters; ++i)
+   {
+      if (level->monsters[i]->pathfinding == RANDOM)
+      {
+
+      }
+      else
+      {
+         /* Seeking Pathfinding */
+         mvprintw(level->monsters[i]->location.y, level->monsters[i]->location.x, ".");
+         PathingSeek(&(level->player->location), &(level->monsters[i]->location));   
+         mvprintw(level->monsters[i]->location.y, level->monsters[i]->location.x, level->monsters[i]->string);
+      }
+   }
+}
+
+void PathingSeek(Coordinate *destination, Coordinate *start)
+{
+   if ((abs((start->y - 1) - destination->y) < abs(start->y - destination->y)) && 
+         (mvinch(start->y - 1, start->x) == '.'))
+   {
+      start->y -= 1;
+   }
+
+   /* Try to grow left. */
+   else if ((abs((start->x - 1) - destination->x) < abs(start->x - destination->x)) && 
+         (mvinch(start->y, start->x - 1) == '.'))
+   {
+      start->x -= 1;
+   }
+
+   /* Try to grow down. */
+   else if ((abs((start->y + 1) - destination->y) < abs(start->y - destination->y)) && 
+         (mvinch(start->y + 1, start->x) == '.'))
+   {
+      start->y += 1;
+   }
+
+   /* Try to grow right. */
+   else if ((abs((start->x + 1) - destination->x) < abs(start->x - destination->x)) && 
+         (mvinch(start->y, start->x + 1) == '.'))
+   {
+      start->x += 1;
+   }
 }

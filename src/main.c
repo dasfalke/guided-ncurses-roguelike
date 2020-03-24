@@ -5,7 +5,6 @@ int main(void)
    srand(time(NULL));   // Seed the pseudo-random number generator
 
    Level *level;
-   Player *player;
    Coordinate destination; /* Note: tutorial uses a pointer here */
    int input;
 
@@ -13,17 +12,19 @@ int main(void)
 
    level = CreateLevel(1);
 
-   player = PlayerSetup();
+
 
    /* *** Main Game Loop *** */
    while ((input = getch()) != 'q')
    {
-      destination = HandleInput(player, input); 
-      CheckDestination(player, level->tiles, destination);
+      destination = HandleInput(level->player, input); 
+      CheckDestination(level->player, level->tiles, destination);
+      MoveMonsters(level);
+      move(level->player->location.y, level->player->location.x);
    }
 
    /* Free memory */
-   DestroyPlayer(player);
+   //TODO: lol
 
    endwin();                  // terminate ncurses
 

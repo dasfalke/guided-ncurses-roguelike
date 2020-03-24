@@ -9,7 +9,11 @@ Level *CreateLevel(int id)
    level->rooms = RoomSetup();
    level->tiles = SaveLevelPositions();
 
+   level->player = PlayerSetup();
+
    AddMonster(level);
+
+   move(level->player->location.y, level->player->location.x);
 
    return level;
 }

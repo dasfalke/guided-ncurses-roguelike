@@ -16,6 +16,7 @@ typedef struct Level
    struct Room **rooms;
    struct Monster **monsters;
    int numberOfMonsters;
+   struct Player *player;
 } Level;
 
 typedef struct Coordinate
@@ -33,6 +34,11 @@ typedef struct Room
    Coordinate doors[4];
 } Room;
 
+typedef enum Pathing {
+   RANDOM,
+   SEEKING
+} Pathing;
+
 typedef struct Player
 {
    Coordinate location;
@@ -41,12 +47,13 @@ typedef struct Player
 
 typedef struct Monster
 {
+   char string[2];
    char symbol;
    int health;
    int attack;
    int speed;
    int defense;
-   int pathfinding;
+   Pathing pathfinding;
    Coordinate location;
 } Monster;
 
@@ -55,6 +62,8 @@ typedef enum Bestiary {
    GOBLIN,
    TROLL
 } Bestiary;
+
+
 
 void *SafeMalloc(size_t size);
 void ScreenSetup(void);
@@ -73,8 +82,10 @@ void DestroyRooms(Room **rooms);
 void ConnectDoors(Coordinate *doorOne, Coordinate *doorTwo);
 void AddMonster(Level *level);
 Monster *SelectMonster(int levelId);
-Monster *CreateMonster(char symbol, int health, int attack, int speed, int defense, int pathfinding);
+Monster *CreateMonster(char symbol, int health, int attack, int speed, int defense, Pathing pathfinding);
 void SetStartingPosition(Monster *monster, Room *room);
+void PathingSeek(Coordinate *destination, Coordinate *start);
+void MoveMonsters(Level *level);
 
 
 #endif /* ROGUE_H */
