@@ -7,6 +7,16 @@
 
 #define NUM_OF_ROOMS 3
 
+typedef struct Level
+{
+   int id;
+   char **tiles;
+   int numberOfRooms;
+   struct Room **rooms;
+   struct Monster **monsters;
+   int numberOfMonsters;
+} Level;
+
 typedef struct Coordinate
 {
    int y;
@@ -30,14 +40,15 @@ typedef struct Player
 
 void *SafeMalloc(size_t size);
 void ScreenSetup(void);
-Room **MapSetup(void);
+Level *CreateLevel(int id);
+Room **RoomSetup(void);
 char **SaveLevelPositions(void);
 Player *PlayerSetup(void);
 void DestryPlayer(Player *player);
 void DestroyPlayer(Player *player);
 Coordinate HandleInput(Player *player, int input);
-void PlayerMove(Player *player, char **level, Coordinate destination);
-void CheckDestination(Player *player, char **level, Coordinate destination);
+void PlayerMove(Player *player, char **tiles, Coordinate destination);
+void CheckDestination(Player *player, char **tiles, Coordinate destination);
 Room *CreateRoom(int y, int x, int height, int width);
 void DrawRoom(Room *room);
 void DestroyRooms(Room **rooms);

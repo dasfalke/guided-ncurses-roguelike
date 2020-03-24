@@ -26,12 +26,12 @@ void DestroyPlayer(Player *player)
 }
 
 /* Moves player character. */
-void PlayerMove(Player *player, char **level, Coordinate destination)
+void PlayerMove(Player *player, char **tiles, Coordinate destination)
 {
    /* Using the level character map, print the appropriate character after the 
     * player leaves that tile. */
    char tileString[8];
-   sprintf(tileString, "%c", level[player->location.y][player->location.x]);
+   sprintf(tileString, "%c", tiles[player->location.y][player->location.x]);
    mvprintw(player->location.y, player->location.x, tileString);  // Redraw floor
 
    player->location.y = destination.y;  // update player's internal position state
@@ -42,14 +42,14 @@ void PlayerMove(Player *player, char **level, Coordinate destination)
 }
 
 /* Checks destination tile and processes move. */
-void CheckDestination(Player *player, char **level, Coordinate destination)
+void CheckDestination(Player *player, char **tiles, Coordinate destination)
 {
    switch (mvinch(destination.y, destination.x))   // mvinch returns character at (y,x)
    {
       case '.':
       case '+':
       case '#':
-         PlayerMove(player, level, destination);
+         PlayerMove(player, tiles, destination);
          break;
       default:
          move(player->location.y, player->location.x);  // Fix cursor

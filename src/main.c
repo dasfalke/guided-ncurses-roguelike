@@ -4,17 +4,14 @@ int main(void)
 {
    srand(time(NULL));   // Seed the pseudo-random number generator
 
-   Room **rooms;
+   Level *level;
    Player *player;
-   int input;
    Coordinate destination; /* Note: tutorial uses a pointer here */
-
+   int input;
 
    ScreenSetup();
-   rooms = MapSetup();
 
-   char **level;
-   level = SaveLevelPositions(); /* TODO: need to free memory! */
+   level = CreateLevel(1);
 
    player = PlayerSetup();
 
@@ -22,11 +19,10 @@ int main(void)
    while ((input = getch()) != 'q')
    {
       destination = HandleInput(player, input); 
-      CheckDestination(player, level, destination);
+      CheckDestination(player, level->tiles, destination);
    }
 
    /* Free memory */
-   DestroyRooms(rooms);
    DestroyPlayer(player);
 
    endwin();                  // terminate ncurses

@@ -1,7 +1,19 @@
 #include "rogue.h"
 
+Level *CreateLevel(int id)
+{
+   Level *level = (Level *)SafeMalloc(sizeof(Level));
+
+   level->id = id;
+   level->numberOfRooms = 3; /* temporary hardcode */
+   level->rooms = RoomSetup();
+   level->tiles = SaveLevelPositions();
+
+   return level;
+}
+
 /* Creates the map. */
-Room **MapSetup(void)
+Room **RoomSetup(void)
 {
    Room **rooms = (Room **)SafeMalloc(sizeof(Room) * NUM_OF_ROOMS);
 
@@ -30,7 +42,7 @@ char **SaveLevelPositions(void)
       /* Magic number 100 is the size of the map */
       for (int x = 0; x < 100; ++x)
       {
-         positions[y][x] = mvinch(y, x);
+         positions[y][x] = (char)mvinch(y, x);
       }
    }
 
