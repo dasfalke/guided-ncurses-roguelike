@@ -6,6 +6,7 @@
 #include <time.h>
 
 #define NUM_OF_ROOMS 3
+#define MAX_MONSTERS_PER_LEVEL 6
 
 typedef struct Level
 {
@@ -38,6 +39,23 @@ typedef struct Player
    int health;
 } Player;
 
+typedef struct Monster
+{
+   char symbol;
+   int health;
+   int attack;
+   int speed;
+   int defense;
+   int pathfinding;
+   Coordinate location;
+} Monster;
+
+typedef enum Bestiary {
+   SPIDER,
+   GOBLIN,
+   TROLL
+} Bestiary;
+
 void *SafeMalloc(size_t size);
 void ScreenSetup(void);
 Level *CreateLevel(int id);
@@ -53,5 +71,10 @@ Room *CreateRoom(int y, int x, int height, int width);
 void DrawRoom(Room *room);
 void DestroyRooms(Room **rooms);
 void ConnectDoors(Coordinate *doorOne, Coordinate *doorTwo);
+void AddMonster(Level *level);
+Monster *SelectMonster(int levelId);
+Monster *CreateMonster(char symbol, int health, int attack, int speed, int defense, int pathfinding);
+void SetStartingPosition(Monster *monster, Room *room);
+
 
 #endif /* ROGUE_H */

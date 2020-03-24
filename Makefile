@@ -6,7 +6,7 @@ INCDIR = ./include/
 
 SOURCES = $(SRCDIR)*.c
 
-all: rogue run clean
+all: clean rogue run clean
 
 run: 
 	./rogue
@@ -15,4 +15,4 @@ rogue:
 	$(CC) $(SOURCES) $(CFLAGS) -o $(@)
 
 clean: 
-	rm rogue
+	rm -f rogue
