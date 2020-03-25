@@ -5,7 +5,7 @@
 #include <ncurses.h>
 #include <time.h>
 
-#define NUM_OF_ROOMS 3
+#define NUM_OF_ROOMS 6
 #define MAX_MONSTERS_PER_LEVEL 6
 
 typedef struct Level
@@ -92,12 +92,13 @@ Level *CreateLevel(int id);
 Room **RoomSetup(void);
 char **SaveLevelPositions(void);
 Player *PlayerSetup(void);
+void PlacePlayer(Room **rooms, Player *player);
 void DestryPlayer(Player *player);
 void DestroyPlayer(Player *player);
 Coordinate HandleInput(Player *player, int input);
 void PlayerMove(Player *player, char **tiles, Coordinate destination);
 void CheckDestination(Level *level, Coordinate destination);
-Room *CreateRoom(int y, int x, int height, int width);
+Room *CreateRoom(int grid);
 void DrawRoom(Room *room);
 void DestroyRooms(Room **rooms);
 void ConnectDoors(Coordinate *doorOne, Coordinate *doorTwo);

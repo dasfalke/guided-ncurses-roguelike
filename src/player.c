@@ -5,19 +5,22 @@ Player *PlayerSetup(void)
 {
    Player *player = (Player *)SafeMalloc(sizeof(Player));
 
-   player->location.y = 14;
-   player->location.x = 14;
    player->health = 20;
    player->maxHealth = 20;
    player->attack = 1;
    player->gold = 0;
    player->xp = 0;
 
-   /* Manually place the new player */
+   return player;
+}
+
+void PlacePlayer(Room **rooms, Player *player)
+{
+   player->location.y = rooms[3]->origin.y + 1; /* Starting position is hard coded for the time being. */
+   player->location.x = rooms[3]->origin.x + 1; 
+
    mvprintw(player->location.y, player->location.x, "@");
    move(player->location.y, player->location.x);
-
-   return player;
 }
 
 /* Frees player memory. */

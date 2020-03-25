@@ -1,29 +1,68 @@
 #include "rogue.h"
 
+#define GRID_RECT_HEIGHT 11
+#define GRID_RECT_WIDTH 26
+#define MIN_ROOM_HEIGHT 4
+#define MIN_ROOM_WIDTH 6
+#define MAX_ROOM_VARIABLE_HEIGHT 5
+#define MAX_ROOM_VARIABLE_WIDTH 20
+
 /* Creates a single room. */
-Room *CreateRoom(int y, int x, int height, int width)
+Room *CreateRoom(int grid)
 {
    Room *room = (Room *)SafeMalloc(sizeof(Room));
 
-   room->origin.y = y;
-   room->origin.x = x;
-   room->height = height;
-   room->width = width;
+   switch (grid)
+   {
+      /* This switch statement breaks the game screen into a 2x3 (row x col) grid. 
+       * Upto one room will be generated for each grid square. */
+      case 0:
+         room->origin.y = 0;
+         room->origin.x = 0;
+         break;
+      case 1:
+         room->origin.y = 0;
+         room->origin.x = GRID_RECT_WIDTH;
+         break;
+      case 2:
+         room->origin.y = 0;
+         room->origin.x = GRID_RECT_WIDTH * 2;
+         break;
+      case 3:
+         room->origin.y = GRID_RECT_HEIGHT;
+         room->origin.x = 0;
+         break;
+      case 4:
+         room->origin.y = GRID_RECT_HEIGHT;
+         room->origin.x = GRID_RECT_WIDTH;
+         break;
+      case 5:
+         room->origin.y = GRID_RECT_HEIGHT;
+         room->origin.x = GRID_RECT_WIDTH * 2;
+         break;
+   }
+
+   room->height = rand() % MAX_ROOM_VARIABLE_HEIGHT + MIN_ROOM_HEIGHT;   /* Creates a height between 4 and 8 */
+   room->width = rand() % MAX_ROOM_VARIABLE_WIDTH + MIN_ROOM_WIDTH;   /* Creates a width between 4 and 23 */
+
+   /* Room origin offset */
+   room->origin.y += rand() % (GRID_RECT_HEIGHT - room->height);
+   room->origin.x += rand() % (GRID_RECT_WIDTH - room->width);
 
    /* Top door */
    room->doors[0].y = room->origin.y;
-   room->doors[0].x = rand() % (width - 2)  + room->origin.x + 1; // Remember to compensate for corners
+   room->doors[0].x = rand() % (room->width - 2)  + room->origin.x + 1; // Remember to compensate for corners
 
    /* Left door */
-   room->doors[1].y = rand() % (height - 2) + room->origin.y + 1;
+   room->doors[1].y = rand() % (room->height - 2) + room->origin.y + 1;
    room->doors[1].x = room->origin.x;
 
    /* Bottom door */
    room->doors[2].y = room->origin.y + room->height - 1;
-   room->doors[2].x = rand() % (width - 2) + room->origin.x + 1;
+   room->doors[2].x = rand() % (room->width - 2) + room->origin.x + 1;
 
    /* Right door */
-   room->doors[3].y = rand() % (height - 2) + room->origin.y + 1;
+   room->doors[3].y = rand() % (room->height - 2) + room->origin.y + 1;
    room->doors[3].x = room->origin.x + room->width - 1;
 
    return room;
