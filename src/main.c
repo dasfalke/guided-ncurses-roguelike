@@ -11,12 +11,13 @@ int main(void)
    ScreenSetup();
 
    level = CreateLevel(1);
-
+   PrintGameHUD(level);
 
 
    /* *** Main Game Loop *** */
    while ((input = getch()) != 'q')
    {
+      PrintGameHUD(level);
       destination = HandleInput(level->player, input); 
       CheckDestination(level, destination);
       MoveMonsters(level);
@@ -44,15 +45,6 @@ void *SafeMalloc(size_t size)
 
    return vp;
 }
-
-/* Prepares the ncurses screen. */
-void ScreenSetup(void)
-{
-   initscr();                 // initializes screen
-   noecho();                  // Prevents keystrokes from displaying
-   refresh();                 // Draw to screen
-}
-
 
 /* Handles user input. */
 Coordinate HandleInput(Player *player, int input)

@@ -8,7 +8,10 @@ Player *PlayerSetup(void)
    player->location.y = 14;
    player->location.x = 14;
    player->health = 20;
+   player->maxHealth = 20;
    player->attack = 1;
+   player->gold = 0;
+   player->xp = 0;
 
    /* Manually place the new player */
    mvprintw(player->location.y, player->location.x, "@");

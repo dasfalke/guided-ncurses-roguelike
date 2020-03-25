@@ -44,7 +44,10 @@ typedef struct Player
 {
    Coordinate location;
    int health;
+   int maxHealth;
    int attack;
+   int gold;
+   int xp;
 } Player;
 
 typedef struct Monster
@@ -108,6 +111,7 @@ void MoveMonsters(Level *level);
 void Combat(Player *player, Monster *monster, AttackOrder order);
 Monster *GetMonsterAt(Coordinate *location, Monster **monsters);
 void KillMonster(Monster *monster);
+void PrintGameHUD(Level *level);
 
 
 

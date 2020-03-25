@@ -14,6 +14,7 @@ void Combat(Player *player, Monster *monster, AttackOrder order)
       else 
       {
          KillMonster(monster);
+         player->xp++;
       }
    }
    /* Monster attacking */
