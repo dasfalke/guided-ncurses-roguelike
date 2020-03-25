@@ -75,6 +75,7 @@ Monster *CreateMonster(char symbol, int health, int attack, int speed, int defen
 
    monster->symbol = symbol;
    monster->health = health;
+   monster->alive = 1;
    monster->attack = attack;
    monster->speed = speed;
    monster->defense = defense;
@@ -97,20 +98,24 @@ void MoveMonsters(Level *level)
 {
    for (int i = 0; i < level->numberOfMonsters; ++i)
    {
+      /* Dead monsters don't get to participate */
+      if (!level->monsters[i]->alive)
+      {
+         continue;
+      }
+
+      mvprintw(level->monsters[i]->location.y, level->monsters[i]->location.x, ".");
+
       if (level->monsters[i]->pathfinding == RANDOM)
       {
-         /* Random Pathfinding */
-         mvprintw(level->monsters[i]->location.y, level->monsters[i]->location.x, ".");
          PathingRandom(&level->monsters[i]->location);
-         mvprintw(level->monsters[i]->location.y, level->monsters[i]->location.x, level->monsters[i]->string);
       }
       else
       {
-         /* Seeking Pathfinding */
-         mvprintw(level->monsters[i]->location.y, level->monsters[i]->location.x, ".");
          PathingSeek(&level->player->location, &level->monsters[i]->location);   
-         mvprintw(level->monsters[i]->location.y, level->monsters[i]->location.x, level->monsters[i]->string);
       }
+      
+      mvprintw(level->monsters[i]->location.y, level->monsters[i]->location.x, level->monsters[i]->string);
    }
 }
 
@@ -177,4 +182,24 @@ void PathingSeek(Coordinate *target, Coordinate *start)
    {
       start->x += 1;
    }
+}
+
+Monster *GetMonsterAt(Coordinate *location, Monster **monsters)
+{
+   for (int i = 0; i < MAX_MONSTERS_PER_LEVEL; ++i)
+   {
+      if (location->y == monsters[i]->location.y && location->x == monsters[i]->location.x)
+      {
+         return monsters[i];
+      }
+   }
+
+   fputs("Failed to find monster\n", stderr);
+   exit(EXIT_FAILURE);
+}
+
+void KillMonster(Monster *monster)
+{
+   mvprintw(monster->location.y, monster->location.x, ".");
+   monster->alive = 0;
 }

@@ -8,6 +8,7 @@ Player *PlayerSetup(void)
    player->location.y = 14;
    player->location.x = 14;
    player->health = 20;
+   player->attack = 1;
 
    /* Manually place the new player */
    mvprintw(player->location.y, player->location.x, "@");
@@ -42,17 +43,21 @@ void PlayerMove(Player *player, char **tiles, Coordinate destination)
 }
 
 /* Checks destination tile and processes move. */
-void CheckDestination(Player *player, char **tiles, Coordinate destination)
+void CheckDestination(Level *level, Coordinate destination)
 {
    switch (mvinch(destination.y, destination.x))   // mvinch returns character at (y,x)
    {
       case '.':
       case '+':
       case '#':
-         PlayerMove(player, tiles, destination);
+         PlayerMove(level->player, level->tiles, destination);
          break;
+      case 'X':
+      case 'G':
+      case 'T':
+         Combat(level->player, GetMonsterAt(&destination, level->monsters), PLAYER);
       default:
-         move(player->location.y, player->location.x);  // Fix cursor
+         move(level->player->location.y, level->player->location.x);  // Fix cursor
          break;
    }
 }

@@ -18,7 +18,7 @@ int main(void)
    while ((input = getch()) != 'q')
    {
       destination = HandleInput(level->player, input); 
-      CheckDestination(level->player, level->tiles, destination);
+      CheckDestination(level, destination);
       MoveMonsters(level);
       move(level->player->location.y, level->player->location.x);
    }

@@ -34,7 +34,8 @@ typedef struct Room
    Coordinate doors[4];
 } Room;
 
-typedef enum Pathing {
+typedef enum Pathing 
+{
    RANDOM,
    SEEKING
 } Pathing;
@@ -43,6 +44,7 @@ typedef struct Player
 {
    Coordinate location;
    int health;
+   int attack;
 } Player;
 
 typedef struct Monster
@@ -50,6 +52,7 @@ typedef struct Monster
    char string[2];
    char symbol;
    int health;
+   int alive;
    int attack;
    int speed;
    int defense;
@@ -57,18 +60,26 @@ typedef struct Monster
    Coordinate location;
 } Monster;
 
-typedef enum Bestiary {
+typedef enum Bestiary 
+{
    SPIDER,
    GOBLIN,
    TROLL
 } Bestiary;
 
-typedef enum Direction {
+typedef enum Direction 
+{
    NORTH,
    WEST,
    SOUTH,
    EAST
 } Direction;
+
+typedef enum AttackOrder 
+{
+   MONSTER,
+   PLAYER
+} AttackOrder;
 
 
 
@@ -82,7 +93,7 @@ void DestryPlayer(Player *player);
 void DestroyPlayer(Player *player);
 Coordinate HandleInput(Player *player, int input);
 void PlayerMove(Player *player, char **tiles, Coordinate destination);
-void CheckDestination(Player *player, char **tiles, Coordinate destination);
+void CheckDestination(Level *level, Coordinate destination);
 Room *CreateRoom(int y, int x, int height, int width);
 void DrawRoom(Room *room);
 void DestroyRooms(Room **rooms);
@@ -94,6 +105,10 @@ void SetStartingPosition(Monster *monster, Room *room);
 void PathingRandom(Coordinate *start);
 void PathingSeek(Coordinate *destination, Coordinate *start);
 void MoveMonsters(Level *level);
+void Combat(Player *player, Monster *monster, AttackOrder order);
+Monster *GetMonsterAt(Coordinate *location, Monster **monsters);
+void KillMonster(Monster *monster);
+
 
 
 #endif /* ROGUE_H */
