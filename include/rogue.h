@@ -63,6 +63,13 @@ typedef enum Bestiary {
    TROLL
 } Bestiary;
 
+typedef enum Direction {
+   NORTH,
+   WEST,
+   SOUTH,
+   EAST
+} Direction;
+
 
 
 void *SafeMalloc(size_t size);
@@ -84,6 +91,7 @@ void AddMonster(Level *level);
 Monster *SelectMonster(int levelId);
 Monster *CreateMonster(char symbol, int health, int attack, int speed, int defense, Pathing pathfinding);
 void SetStartingPosition(Monster *monster, Room *room);
+void PathingRandom(Coordinate *start);
 void PathingSeek(Coordinate *destination, Coordinate *start);
 void MoveMonsters(Level *level);
 

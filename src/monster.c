@@ -99,42 +99,80 @@ void MoveMonsters(Level *level)
    {
       if (level->monsters[i]->pathfinding == RANDOM)
       {
-
+         /* Random Pathfinding */
+         mvprintw(level->monsters[i]->location.y, level->monsters[i]->location.x, ".");
+         PathingRandom(&level->monsters[i]->location);
+         mvprintw(level->monsters[i]->location.y, level->monsters[i]->location.x, level->monsters[i]->string);
       }
       else
       {
          /* Seeking Pathfinding */
          mvprintw(level->monsters[i]->location.y, level->monsters[i]->location.x, ".");
-         PathingSeek(&(level->player->location), &(level->monsters[i]->location));   
+         PathingSeek(&level->player->location, &level->monsters[i]->location);   
          mvprintw(level->monsters[i]->location.y, level->monsters[i]->location.x, level->monsters[i]->string);
       }
    }
 }
 
-void PathingSeek(Coordinate *destination, Coordinate *start)
+void PathingRandom(Coordinate *start)
 {
-   if ((abs((start->y - 1) - destination->y) < abs(start->y - destination->y)) && 
+   Direction random = rand() % 5; /* Cardinal directions plus not moving. */
+
+   switch (random)
+   {
+      case NORTH:
+         if (mvinch(start->y - 1, start->x) == '.')
+         {
+            start->y -= 1;
+         }
+         break;
+      case WEST:
+         if (mvinch(start->y, start->x - 1) == '.')
+         {
+            start->x -= 1;
+         }
+         break;
+      case SOUTH:
+         if (mvinch(start->y + 1, start->x) == '.')
+         {
+            start->y += 1;
+         }
+         break;
+      case EAST:
+         if (mvinch(start->y, start->x + 1) == '.')
+         {
+            start->x += 1;
+         }
+         break;
+      default:
+         break;
+   }
+}
+
+void PathingSeek(Coordinate *target, Coordinate *start)
+{
+   if ((abs((start->y - 1) - target->y) < abs(start->y - target->y)) && 
          (mvinch(start->y - 1, start->x) == '.'))
    {
       start->y -= 1;
    }
 
    /* Try to grow left. */
-   else if ((abs((start->x - 1) - destination->x) < abs(start->x - destination->x)) && 
+   else if ((abs((start->x - 1) - target->x) < abs(start->x - target->x)) && 
          (mvinch(start->y, start->x - 1) == '.'))
    {
       start->x -= 1;
    }
 
    /* Try to grow down. */
-   else if ((abs((start->y + 1) - destination->y) < abs(start->y - destination->y)) && 
+   else if ((abs((start->y + 1) - target->y) < abs(start->y - target->y)) && 
          (mvinch(start->y + 1, start->x) == '.'))
    {
       start->y += 1;
    }
 
    /* Try to grow right. */
-   else if ((abs((start->x + 1) - destination->x) < abs(start->x - destination->x)) && 
+   else if ((abs((start->x + 1) - target->x) < abs(start->x - target->x)) && 
          (mvinch(start->y, start->x + 1) == '.'))
    {
       start->x += 1;
