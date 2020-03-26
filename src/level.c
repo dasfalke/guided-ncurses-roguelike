@@ -30,7 +30,7 @@ Room **RoomSetup(void)
       DrawRoom(rooms[i]);
    }
 
-
+   Pathfind(&rooms[3]->doors[0], &rooms[1]->doors[2]);
    //ConnectDoors(&rooms[2]->doors[1], &rooms[0]->doors[3]);
    //ConnectDoors(&rooms[0]->doors[0], &rooms[1]->doors[2]);
 

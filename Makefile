@@ -4,7 +4,7 @@ CFLAGS = -lncurses -I$(INCDIR)
 SRCDIR = ./src/
 INCDIR = ./include/
 
-SOURCES = $(SRCDIR)*.c
+SOURCES = $(SRCDIR)*.c $(SRCDIR)utils/*.c
 
 all: rogue
 

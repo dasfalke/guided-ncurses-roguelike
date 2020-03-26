@@ -4,9 +4,12 @@
 #include <stdlib.h>
 #include <ncurses.h>
 #include <time.h>
+#include "utils.h"
 
 #define NUM_OF_ROOMS 6
 #define MAX_MONSTERS_PER_LEVEL 6
+#define SCREEN_HEIGHT 24   /* Hardcoded for now. */
+#define SCREEN_WIDTH 80    /* Hardcoded for now. */
 
 typedef struct Level
 {
@@ -114,6 +117,6 @@ Monster *GetMonsterAt(Coordinate *location, Monster **monsters);
 void KillMonster(Monster *monster);
 void PrintGameHUD(Level *level);
 
-
+void Pathfind(Coordinate *end, Coordinate *start);
 
 #endif /* ROGUE_H */
