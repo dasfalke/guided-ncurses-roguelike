@@ -5,6 +5,8 @@ void ScreenSetup(void)
 {
    initscr();                 // initializes screen
    noecho();                  // Prevents keystrokes from displaying
+   keypad(stdscr, TRUE);      // Gives ncurses access to arrow keys
+
    refresh();                 // Draw to screen
 }
 

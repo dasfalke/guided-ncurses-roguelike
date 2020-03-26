@@ -1,15 +1,10 @@
 #include "rogue.h"
 
-int main(void)
+int GameLoop()
 {
-   srand(time(NULL));   // Seed the pseudo-random number generator
-
-   Level *level;
    Coordinate destination; /* Note: tutorial uses a pointer here */
    int input;
-
-   ScreenSetup();
-
+   Level *level;
    level = CreateLevel(1);
    PrintGameHUD(level);
 
@@ -22,28 +17,47 @@ int main(void)
       CheckDestination(level, destination);
       MoveMonsters(level);
       move(level->player->location.y, level->player->location.x);
+
+      if (level->player->health <= 0)
+      {
+         return -1;
+      }
    }
-
-   /* Free memory */
-   //TODO: lol
-
-   endwin();                  // terminate ncurses
 
    return 0;
 }
 
-/* Utility function for allocating memory on the heap. */
-void *SafeMalloc(size_t size)
+void MenuLoop()
 {
-   void *vp;
+   int choice;
 
-   if ((vp = malloc(size)) == NULL)
+   while (1)
    {
-      fputs("malloc failure\n", stderr);
-      exit(EXIT_FAILURE);
-   }
+      char *choices[] = {"Start Game", "End Game"};
+      choice = MainMenu(2, choices);
 
-   return vp;
+      switch (choice)
+      {
+         case START_GAME:
+            GameLoop();
+            clear(); 
+            break;
+         case QUIT_GAME:
+            return;
+      } 
+   }
+}
+
+
+int main(void)
+{
+   srand(time(NULL));   // Seed the pseudo-random number generator
+
+   ScreenSetup();
+   MenuLoop();
+   endwin();                  // terminate ncurses
+
+   return 0;
 }
 
 /* Handles user input. */

@@ -1,10 +1,10 @@
 CC = gcc
-CFLAGS = -lncurses -I$(INCDIR)
+CFLAGS = -lncurses -lmenu -I$(INCDIR)
 
 SRCDIR = ./src/
 INCDIR = ./include/
 
-SOURCES = $(SRCDIR)*.c $(SRCDIR)utils/*.c
+SOURCES = $(SRCDIR)*.c $(SRCDIR)utils/*.c $(SRCDIR)windows/*.c
 
 all: rogue
 

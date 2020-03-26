@@ -1,10 +1,11 @@
 #ifndef ROGUE_H
 #define ROGUE_H
 
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <ncurses.h>
 #include <time.h>
 #include "utils.h"
+#include "mainmenu.h"
 
 #define NUM_OF_ROOMS 6
 #define MAX_MONSTERS_PER_LEVEL 6
