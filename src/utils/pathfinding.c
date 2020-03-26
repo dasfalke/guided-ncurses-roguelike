@@ -7,10 +7,16 @@ void AddPositionYX(int **frontier, int y, int x, int count)
    frontier[count][1] = x;
 }
 
+int CheckPosition(int y, int x)
+{
+   char temp = mvinch(y, x);
+   return (temp != '.' && temp != '|' && temp != '-');
+}
+
 int AddNeighbors(int **frontier, int ***cameFrom, int count, int y, int x)
 {
    /* North neighbor */
-   if (y > 0 && cameFrom[y - 1][x][0] < 0) 
+   if (y > 0 && cameFrom[y - 1][x][0] < 0 && CheckPosition(y - 1, x)) 
    {
       AddPositionYX(frontier, y - 1, x, count);
       cameFrom[y - 1][x][0] = y;
@@ -18,7 +24,7 @@ int AddNeighbors(int **frontier, int ***cameFrom, int count, int y, int x)
       ++count;
    }
    /* South neighbor */
-   if (y < SCREEN_HEIGHT - 1 && cameFrom[y + 1][x][0] < 0) 
+   if (y < SCREEN_HEIGHT - 1 && cameFrom[y + 1][x][0] < 0 && CheckPosition(y + 1, x)) 
    {
       AddPositionYX(frontier, y + 1, x, count);
       cameFrom[y + 1][x][0] = y;
@@ -26,7 +32,7 @@ int AddNeighbors(int **frontier, int ***cameFrom, int count, int y, int x)
       ++count;
    }
    /* East neighbor */
-   if (x < SCREEN_WIDTH - 1 && cameFrom[y][x + 1][0] < 0) 
+   if (x < SCREEN_WIDTH - 1 && cameFrom[y][x + 1][0] < 0 && CheckPosition(y, x + 1)) 
    {
       AddPositionYX(frontier, y, x + 1, count);
       cameFrom[y][x + 1][0] = y;
@@ -34,7 +40,7 @@ int AddNeighbors(int **frontier, int ***cameFrom, int count, int y, int x)
       ++count;
    }
    /* West neighbor */
-   if (x > 0 && cameFrom[y][x - 1][0] < 0) 
+   if (x > 0 && cameFrom[y][x - 1][0] < 0 && CheckPosition(y, x - 1)) 
    {
       AddPositionYX(frontier, y, x - 1, count);
       cameFrom[y][x - 1][0] = y;
@@ -103,9 +109,10 @@ void Pathfind(Coordinate *end, Coordinate *start)
 
    while (y != start->y || x != start->x)
    {
-      y = cameFrom[y][x][0];
-      x = cameFrom[y][x][1];
-      mvprintw(y, x, "+");
+      int tempY = y;
+      y = cameFrom[tempY][x][0];
+      x = cameFrom[tempY][x][1];
+      mvprintw(y, x, "#");
       getch();
    }
 
