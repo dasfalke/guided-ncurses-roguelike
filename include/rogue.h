@@ -33,9 +33,15 @@ typedef struct Room
    Coordinate origin;
    int height;
    int width;
-
-   Coordinate doors[4];
+   struct Door **doors;
+   int numberOfDoors;
 } Room;
+
+typedef struct Door
+{
+   Coordinate location;
+   int connected;
+} Door;
 
 typedef enum Pathing 
 {
@@ -101,10 +107,10 @@ void DestroyPlayer(Player *player);
 Coordinate HandleInput(Player *player, int input);
 void PlayerMove(Player *player, char **tiles, Coordinate destination);
 void CheckDestination(Level *level, Coordinate destination);
-Room *CreateRoom(int grid);
+Room *CreateRoom(int grid, int numberOfDoors);
 void DrawRoom(Room *room);
 void DestroyRooms(Room **rooms);
-void ConnectDoors(Coordinate *doorOne, Coordinate *doorTwo);
+void ConnectDoors(Level *level);
 void AddMonster(Level *level);
 Monster *SelectMonster(int levelId);
 Monster *CreateMonster(char symbol, int health, int attack, int speed, int defense, Pathing pathfinding);

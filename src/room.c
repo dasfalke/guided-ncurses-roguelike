@@ -1,16 +1,17 @@
 #include "rogue.h"
 
-#define GRID_RECT_HEIGHT 11
-#define GRID_RECT_WIDTH 26
+#define GRID_RECT_HEIGHT 10
+#define GRID_RECT_WIDTH 25
 #define MIN_ROOM_HEIGHT 4
 #define MIN_ROOM_WIDTH 6
 #define MAX_ROOM_VARIABLE_HEIGHT 5
 #define MAX_ROOM_VARIABLE_WIDTH 20
 
 /* Creates a single room. */
-Room *CreateRoom(int grid)
+Room *CreateRoom(int grid, int numberOfDoors)
 {
    Room *room = (Room *)SafeMalloc(sizeof(Room));
+   room->numberOfDoors = numberOfDoors;
 
    switch (grid)
    {
@@ -46,24 +47,31 @@ Room *CreateRoom(int grid)
    room->width = rand() % MAX_ROOM_VARIABLE_WIDTH + MIN_ROOM_WIDTH;   /* Creates a width between 4 and 23 */
 
    /* Room origin offset */
-   room->origin.y += rand() % (GRID_RECT_HEIGHT - room->height);
-   room->origin.x += rand() % (GRID_RECT_WIDTH - room->width);
+   room->origin.y += rand() % (GRID_RECT_HEIGHT - room->height) + 1;
+   room->origin.x += rand() % (GRID_RECT_WIDTH - room->width) + 1;
+
+   room->doors = (Door **)SafeMalloc(sizeof(Door *) * numberOfDoors);
+   for (int i = 0; i < numberOfDoors; ++i)
+   {
+      room->doors[i] = (Door *)SafeMalloc(sizeof(Door));
+      room->doors[i]->connected = 0;
+   }
 
    /* Top door */
-   room->doors[0].y = room->origin.y;
-   room->doors[0].x = rand() % (room->width - 2)  + room->origin.x + 1; // Remember to compensate for corners
+   room->doors[0]->location.y = room->origin.y;
+   room->doors[0]->location.x = rand() % (room->width - 2)  + room->origin.x + 1; // compensate for corners
 
    /* Left door */
-   room->doors[1].y = rand() % (room->height - 2) + room->origin.y + 1;
-   room->doors[1].x = room->origin.x;
+   room->doors[1]->location.y = rand() % (room->height - 2) + room->origin.y + 1;
+   room->doors[1]->location.x = room->origin.x;
 
    /* Bottom door */
-   room->doors[2].y = room->origin.y + room->height - 1;
-   room->doors[2].x = rand() % (room->width - 2) + room->origin.x + 1;
+   room->doors[2]->location.y = room->origin.y + room->height - 1;
+   room->doors[2]->location.x = rand() % (room->width - 2) + room->origin.x + 1;
 
    /* Right door */
-   room->doors[3].y = rand() % (room->height - 2) + room->origin.y + 1;
-   room->doors[3].x = room->origin.x + room->width - 1;
+   room->doors[3]->location.y = rand() % (room->height - 2) + room->origin.y + 1;
+   room->doors[3]->location.x = room->origin.x + room->width - 1;
 
    return room;
 }
@@ -91,32 +99,34 @@ void DrawRoom(Room *room)
    }
 
    /* Draw the doors */
-   mvprintw(room->doors[0].y, room->doors[0].x, "+");
-   mvprintw(room->doors[1].y, room->doors[1].x, "+");
-   mvprintw(room->doors[2].y, room->doors[2].x, "+");
-   mvprintw(room->doors[3].y, room->doors[3].x, "+");
+   mvprintw(room->doors[0]->location.y, room->doors[0]->location.x, "+");
+   mvprintw(room->doors[1]->location.y, room->doors[1]->location.x, "+");
+   mvprintw(room->doors[2]->location.y, room->doors[2]->location.x, "+");
+   mvprintw(room->doors[3]->location.y, room->doors[3]->location.x, "+");
 
 }
 
-
+/* Depreciated ConnectDoors function. Replaced by new Pathfind function. 
+ * Keeping it here as a learning reference. */
+/*
 void ConnectDoors(Coordinate *doorDest, Coordinate *doorSrc)
 {
-   /* Temporary end of the hallway as it grows towards its destination. */
+   // Temporary end of the hallway as it grows towards its destination.
    Coordinate hallTail; 
    hallTail.y = doorSrc->y;
    hallTail.x = doorSrc->x;
 
-   /* Remember previous hallway coordinate. Used when needing to step back. */
+   // Remember previous hallway coordinate. Used when needing to step back.
    Coordinate hallPrevious;
    hallPrevious = hallTail;
 
    int steppedBack = 0;
 
-   /* Algorithm to grow the hallway. */
+   // Algorithm to grow the hallway.
    while (1)
    {
-      /* Try to grow up. Check if space to up is closer to destination. If
-       * it is then check if that space is empty. If it is then grow the hallway. */
+      // Try to grow up. Check if space to up is closer to destination. If
+      // it is then check if that space is empty. If it is then grow the hallway.
       if ((abs((hallTail.y - 1) - doorDest->y) < abs(hallTail.y - doorDest->y)) && 
             (mvinch(hallTail.y - 1, hallTail.x) == ' '))
          {
@@ -124,7 +134,7 @@ void ConnectDoors(Coordinate *doorDest, Coordinate *doorSrc)
             hallTail.y -= 1;
          }
       
-      /* Try to grow left. */
+      // Try to grow left.
       else if ((abs((hallTail.x - 1) - doorDest->x) < abs(hallTail.x - doorDest->x)) && 
             (mvinch(hallTail.y, hallTail.x - 1) == ' '))
          {
@@ -132,7 +142,7 @@ void ConnectDoors(Coordinate *doorDest, Coordinate *doorSrc)
             hallTail.x -= 1;
          }
 
-      /* Try to grow down. */
+      // Try to grow down.
       else if ((abs((hallTail.y + 1) - doorDest->y) < abs(hallTail.y - doorDest->y)) && 
             (mvinch(hallTail.y + 1, hallTail.x) == ' '))
          {
@@ -140,7 +150,7 @@ void ConnectDoors(Coordinate *doorDest, Coordinate *doorSrc)
             hallTail.y += 1;
          }
 
-      /* Try to grow right. */
+      // Try to grow right.
       else if ((abs((hallTail.x + 1) - doorDest->x) < abs(hallTail.x - doorDest->x)) && 
             (mvinch(hallTail.y, hallTail.x + 1) == ' '))
          {
@@ -163,8 +173,8 @@ void ConnectDoors(Coordinate *doorDest, Coordinate *doorSrc)
 
       mvprintw(hallTail.y, hallTail.x, "#");
    }
-
 }
+*/
 
 
 /* Frees memory used by room structs. */
