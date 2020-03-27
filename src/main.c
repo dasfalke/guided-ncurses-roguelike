@@ -1,45 +1,22 @@
 #include "rogue.h"
 
-int GameLoop()
-{
-   Coordinate destination; /* Note: tutorial uses a pointer here */
-   int input;
-   Level *level;
-   level = CreateLevel(1);
-   PrintGameHUD(level);
-
-
-   /* *** Main Game Loop *** */
-   while ((input = getch()) != 'q')
-   {
-      PrintGameHUD(level);
-      destination = HandleInput(level->player, input); 
-      CheckDestination(level, destination);
-      MoveMonsters(level);
-      move(level->player->location.y, level->player->location.x);
-
-      if (level->player->health <= 0)
-      {
-         return -1;
-      }
-   }
-
-   return 0;
-}
 
 void MenuLoop()
 {
    int choice;
+   char *choices[] = {"Start Game", "End Game"};
+
+   Game game;
+   game.currentLevel = 0;
 
    while (1)
    {
-      char *choices[] = {"Start Game", "End Game"};
       choice = MainMenu(2, choices);
 
       switch (choice)
       {
          case START_GAME:
-            GameLoop();
+            GameLoop(&game);
             clear(); 
             break;
          case QUIT_GAME:

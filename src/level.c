@@ -20,6 +20,28 @@ Level *CreateLevel(int id)
    return level;
 }
 
+void DrawLevel(Level *level)
+{
+   /* Print tiles */
+   for (int y = 0; y < SCREEN_HEIGHT; ++y)
+   {
+      for (int x = 0; x < SCREEN_WIDTH; ++x)
+      {
+         mvaddch(y, x, level->tiles[y][x]);
+      }
+   }
+
+   /* Print monsters */
+   for (int i = 0; i < level->numberOfMonsters; ++i)
+   {
+      DrawMonster(level->monsters[i]);
+   }
+
+   /* Print player */
+   DrawPlayer(level->player);
+}
+
+
 /* Creates the map. */
 Room **RoomSetup(void)
 {

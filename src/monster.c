@@ -90,8 +90,6 @@ void SetStartingPosition(Monster *monster, Room *room)
 {
    monster->location.y = (rand() % (room->height - 2)) + room->origin.y + 1;
    monster->location.x = (rand() % (room->width - 2)) + room->origin.x + 1;
-
-   mvprintw(monster->location.y, monster->location.x, monster->string);
 }
 
 void MoveMonsters(Level *level)
@@ -104,8 +102,6 @@ void MoveMonsters(Level *level)
          continue;
       }
 
-      mvprintw(level->monsters[i]->location.y, level->monsters[i]->location.x, ".");
-
       if (level->monsters[i]->pathfinding == RANDOM)
       {
          PathingRandom(&level->monsters[i]->location);
@@ -114,8 +110,6 @@ void MoveMonsters(Level *level)
       {
          PathingSeek(&level->player->location, &level->monsters[i]->location);   
       }
-      
-      mvprintw(level->monsters[i]->location.y, level->monsters[i]->location.x, level->monsters[i]->string);
    }
 }
 
@@ -200,6 +194,13 @@ Monster *GetMonsterAt(Coordinate *location, Monster **monsters)
 
 void KillMonster(Monster *monster)
 {
-   mvprintw(monster->location.y, monster->location.x, ".");
    monster->alive = 0;
+}
+
+void DrawMonster(Monster *monster)
+{
+   if (monster->alive)
+   {
+      mvprintw(monster->location.y, monster->location.x, monster->string);
+   }
 }

@@ -18,9 +18,6 @@ void PlacePlayer(Room **rooms, Player *player)
 {
    player->location.y = rooms[3]->origin.y + 1; /* Starting position is hard coded for the time being. */
    player->location.x = rooms[3]->origin.x + 1; 
-
-   mvprintw(player->location.y, player->location.x, "@");
-   move(player->location.y, player->location.x);
 }
 
 /* Frees player memory. */
@@ -35,17 +32,8 @@ void DestroyPlayer(Player *player)
 /* Moves player character. */
 void PlayerMove(Player *player, char **tiles, Coordinate destination)
 {
-   /* Using the level character map, print the appropriate character after the 
-    * player leaves that tile. */
-   char tileString[8];
-   sprintf(tileString, "%c", tiles[player->location.y][player->location.x]);
-   mvprintw(player->location.y, player->location.x, tileString);  // Redraw floor
-
    player->location.y = destination.y;  // update player's internal position state
    player->location.x = destination.x;
-
-   mvprintw(player->location.y, player->location.x, "@"); // Redraw player
-   move(player->location.y, player->location.x); // Fix cursor
 }
 
 /* Checks destination tile and processes move. */
@@ -63,7 +51,12 @@ void CheckDestination(Level *level, Coordinate destination)
       case 'T':
          Combat(level->player, GetMonsterAt(&destination, level->monsters), PLAYER);
       default:
-         move(level->player->location.y, level->player->location.x);  // Fix cursor
          break;
    }
+}
+
+void DrawPlayer(Player *player)
+{
+   mvprintw(player->location.y, player->location.x, "@");
+   move(player->location.y, player->location.x);
 }

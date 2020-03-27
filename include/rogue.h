@@ -12,6 +12,12 @@
 #define SCREEN_HEIGHT 24   /* Hardcoded for now. */
 #define SCREEN_WIDTH 80    /* Hardcoded for now. */
 
+typedef struct Game
+{
+   struct Level *levels[10];   /* hardcoded level count for now */
+   int currentLevel;
+} Game;
+
 typedef struct Level
 {
    int id;
@@ -123,7 +129,10 @@ void Combat(Player *player, Monster *monster, AttackOrder order);
 Monster *GetMonsterAt(Coordinate *location, Monster **monsters);
 void KillMonster(Monster *monster);
 void PrintGameHUD(Level *level);
-
+void DrawLevel(Level *level);
+void DrawMonster(Monster *monster);
+void DrawPlayer(Player *player);
+int GameLoop(Game *game);
 void Pathfind(Coordinate *end, Coordinate *start);
 
 #endif /* ROGUE_H */
