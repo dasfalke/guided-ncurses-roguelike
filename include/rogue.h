@@ -12,6 +12,8 @@
 #define SCREEN_HEIGHT 24   /* Hardcoded for now. */
 #define SCREEN_WIDTH 80    /* Hardcoded for now. */
 
+/* See episode 25 for info on reorganizing this file. */
+
 typedef struct Game
 {
    struct Level *levels[10];   /* hardcoded level count for now */
