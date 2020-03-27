@@ -4,6 +4,7 @@
 //#include <stdlib.h>
 #include <ncurses.h>
 #include <time.h>
+#include <string.h>
 #include "utils.h"
 #include "mainmenu.h"
 
@@ -11,6 +12,7 @@
 #define MAX_MONSTERS_PER_LEVEL 6
 #define SCREEN_HEIGHT 24   /* Hardcoded for now. */
 #define SCREEN_WIDTH 80    /* Hardcoded for now. */
+#define MAX_ITEMS 25
 
 /* See episode 25 for info on reorganizing this file. */
 
@@ -66,6 +68,8 @@ typedef struct Player
    int attack;
    int gold;
    int xp;
+   struct Item **items;
+   int numberOfItems;
 } Player;
 
 typedef struct Monster
@@ -102,7 +106,38 @@ typedef enum AttackOrder
    PLAYER
 } AttackOrder;
 
+typedef enum 
+{
+   WEAPON_TYPE, 
+   POTION_TYPE
+} ItemType;
 
+typedef struct Item
+{
+   ItemType type;
+   Coordinate location;
+
+   union
+   {
+      struct Weapon *weapon;
+      //Potion *poition;
+   } item;
+
+   char string[256];
+} Item;
+
+typedef enum 
+{
+   SWORD_TYPE,
+   SPEAR_TYPE
+} WeaponType;
+
+typedef struct Weapon
+{
+   WeaponType type;
+   int attack;
+   int durability;
+} Weapon;
 
 void *SafeMalloc(size_t size);
 void ScreenSetup(void);
@@ -136,5 +171,7 @@ void DrawMonster(Monster *monster);
 void DrawPlayer(Player *player);
 int GameLoop(Game *game);
 void Pathfind(Coordinate *end, Coordinate *start);
+Item *CreateSword(int attack, int durability);
+void PrintInventory(Player *player);
 
 #endif /* ROGUE_H */

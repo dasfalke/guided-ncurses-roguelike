@@ -11,6 +11,13 @@ Player *PlayerSetup(void)
    player->gold = 0;
    player->xp = 0;
 
+   player->numberOfItems = 0;
+   player->items = (Item **)SafeMalloc(sizeof(Item *) * MAX_ITEMS);
+
+   // Grant player starting weapon
+   player->items[player->numberOfItems] = CreateSword(1, 20);
+   player->numberOfItems++;
+
    return player;
 }
 
